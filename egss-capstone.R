@@ -62,15 +62,14 @@ egss <- as.data.frame(egss) %>% mutate(tau1 = as.numeric(tau1),
                                      g3 = as.numeric(g3),
                                      g4 = as.numeric(g4),
                                      stab = as.numeric(stab),
-                                     stabf = as.character(stabf))
-
-
-# Test set will be 10% of Electrical Grid Stability Simulated data
+                                     stabf = as.factor(stabf))
+# Create dataframe including the 11 predictors and 1 classification 
+egss_df <- as.data.frame(egss[,c(1,2,3,4,6,7,8,9,10,11,12,14)])
+# Test set will be 20% of Electrical Grid Stability Simulated data
 set.seed(1, sample.kind="Rounding")
-# if using R 3.5 or earlier, use `set.seed(1)` instead
-test_index <- createDataPartition(y = egss$stabf, times = 1, p = 0.2, list = FALSE)
-train <- egss[-test_index,]
-temp <- egss[test_index,]
+test_index <- createDataPartition(y = egss_df$stabf, times = 1, p = 0.2, list = FALSE)
+train <- egss_df[-test_index,]
+temp <- egss_df[test_index,]
 # Make sure stabf in test set are also in train set
 test <- temp %>% 
   semi_join(train, by = "stabf")
@@ -84,46 +83,104 @@ rm(dl, test_index, temp, removed)
 # Data Exploration
 #############################################################
 # Data structure
-str(train)
-head(train)
+str(egss)
+head(egss)
 # Check for null values
-sapply(train, {function(x) any(is.na(x))})
+sapply(egss, {function(x) any(is.na(x))})
 # Data summary
-summary(train)
+summary(egss)
 # Plotting stablitiy
-p <-ggplot(train, aes(x=stab, fill = stabf)) +
-  geom_density()
-p
+ggplot(egss, aes(stabf)) +
+  geom_bar(fill = "blue", col = "black") 
+# Distribution of stablitiy
+egss %>% group_by(stabf) %>% tally()
+# Consumer (p[x]: nominal power consumed(negative)/produced(positive)(real). For
+# consumers from the range [-0.5,-2]s^-2; p1 = abs(p2 + p3 + p4) )
+ggplot(egss, aes(p1)) +
+  geom_histogram(binwidth = .1, fill = "blue", col = "black") +
+  xlab("Nominal Power Distribution")
 
 #############################################################
-# Modeling - K-nearest neighbor classifier
+# Model Testing - Electrical Grid Stability Simulated Data 
+# per the UIC documentation this dataset is well suited for 
+# classification and regression machine learning tasks 
+# therefore a series of method shall be processed by the 
+# train funciton in the caret package
 #############################################################
-# create 10%  index of the total number of rows in dataset.
-index <- sample(1:nrow(egss), 0.1 * nrow(egss)) 
-# normalize function
-nor <-function(x) { (x -min(x))/(max(x)-min(x))   }
-#Run nomalization the 11 predictors
-egss_norm <- as.data.frame(lapply(egss[,c(1,2,3,4,6,7,8,9,10,11,12)], nor))
-# Summary
-summary(egss_norm)
-##extract training set
-egss_train <- egss_norm[-index,] 
-##extract testing set
-egss_test <- egss_norm[index,] 
-##extract stabf column of train dataset because it will be used as 'cl' argument
-##in knn function.
-egss_target_category <- egss[index,14] 
-##extract stabf if test dataset to measure the accuracy
-egss_test_category <- egss[-index,14]
-# run knn function
-pr <- knn(egss_train,egss_test,cl=egss_target_category,k=21)
-# create confusion matrix
-tab <- table(pr,egss_test_category)
+egss_train
+# Run algorithms using 10-fold cross validation
+fitControl <- trainControl(method="cv", number=10)
+# Goal is to find the most accurate model, the metric parameter
+# will be used for this.
+metric <- "Accuracy"
+# Linear Discriminant Analysis (LDA)
+set.seed(825)
+fit.lda <- train(stabf~., data=train, 
+                 method="lda", 
+                 metric=metric, 
+                 trControl=fitControl)
+# Classification and Regression Trees (CART)
+set.seed(825)
+fit.cart <- train(stabf~., data=train, 
+                  method="rpart", 
+                  metric=metric, 
+                  trControl=fitControl)
+# GLM
+set.seed(825)
+fit.glm <- train(stabf~., data=train, 
+                  method="glm", 
+                  metric=metric, 
+                  trControl=fitControl)
+# k-Nearest Neighbors (kNN).
+set.seed(825)
+fit.knn <- train(stabf~., data=train, 
+                 method="knn", 
+                 metric=metric, 
+                 trControl=fitControl)
+# Support Vector Machines (SVM) with a linear kernel
+set.seed(825)
+fit.svm <- train(stabf~., data=train, 
+                 method="svmRadial", 
+                 metric=metric, 
+                 trControl=fitControl)
+#  Random Forest (RF)
+set.seed(825)
+fit.rf <- train(stabf~., data=train, 
+                method="rf", 
+                metric=metric, 
+                trControl=fitControl)
+
+# summarize accuracy of models
+results <- resamples(list(lda=fit.lda, 
+                          cart=fit.cart, 
+                          glm=fit.glm,
+                          knn=fit.knn, 
+                          svm=fit.svm, 
+                          rf=fit.rf))
+summary(results)
+# compare accuracy of models
+dotplot(results)
+# summarize Best Model
+print(fit.svm)
+splom(results)
+trellis.par.set(theme1)
+xyplot(results, what = "BlandAltman")
+
+trellis.par.set(caretTheme())
+densityplot(fit.cart, pch = "|")
+
+# Support Vector Machines (SVM) with a linear kernel on the test dataset
+predictions <- predict(fit.svm, test)
+confusionMatrix(predictions, test$stabf)
+
+#############################################################
+# Model Results
+#############################################################
 # this function divides the correct predictions by total number of predictions
 # that tell us how accurate the model is.
 accuracy <- function(x){sum(diag(x)/(sum(rowSums(x)))) * 100}
 # Plotting results
-cm <- confusionMatrix(tab)
+cm <- confusionMatrix(predictions, as.factor(test$stabf))
 draw_confusion_matrix <- function(cm) {
   layout(matrix(c(1,1,2)))
   par(mar=c(2,2,2,2))
@@ -164,5 +221,5 @@ draw_confusion_matrix <- function(cm) {
   text(70, 35, names(cm$overall[2]), cex=1.5, font=2)
   text(70, 20, round(as.numeric(cm$overall[2]), 3), cex=1.4)
 }  
-
 draw_confusion_matrix(cm)
+

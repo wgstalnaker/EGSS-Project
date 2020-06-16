@@ -1,0 +1,20 @@
+---
+title: "Electric Grid Stability Analysis"
+author: "wgstalnaker"
+date: "6/15/2020"
+output: pdf_document
+---
+
+# Introduction
+<!-- An introduction/overview/executive summary section that describes the dataset and variables, and summarizes the goal of the project and key steps that were performed. -->
+
+The current electric network which the mass majority of homes and business connect to is incurring a market distruption. This is coming from the distruptive technology of distributed energy systems, such as residenial solar. 
+
+# Methology
+<!-- A methods/analysis section that explains the process and techniques used, including data cleaning, data exploration and visualization, any insights gained, and your modeling approach. At least two different models or algorithms must be used, with at least one being more advanced than simple linear regression for prediction problems. -->
+   
+# Results                        
+<!-- A results section that presents the modeling results and discusses the model performance. -->
+         
+# Conclusion                        
+<!-- A conclusion section that gives a brief summary of the report, its potential impact, its limitations, and future work. -->
