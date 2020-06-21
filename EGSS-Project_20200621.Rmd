@@ -16,7 +16,7 @@ date: "June 21, 2020"
 
 Today’s electrical grid, which the majority of businesses and residents connect to, is experiencing a new market disruption. The disruptive technology of distributed energy generation, such as residential solar, has introduced new factors impacting grid stability. The grid stability is not immune to other disruptions, such as aging infrastructure, cyber security, and natural disasters. Each of these disruptions have a direct impact to the supply and demand economics of the electrical grid as a whole.
 
-To reduce the impact, decentralizing the grid has been proposed Arzamasov, Bohm and Jochem, of the Karlsruhe Institute of Technology in Germany suggest (2018), “Decentralize Smart Grid Control (DSGC) is a new system implementing demand response without significant changes of the infrastructure.” Analysis of the factors and impacts associated with implementing a DSGC system are outside of the scope for this paper. This paper will focus on implementation of machine learning models to predict stability of the grid, utilizing the data set Arzamasov created (2018). This data set is a simulation of a four-node star electrical grid with centralized production. The data set includes 14 total attributes - 11 predictive attributes, one non-predictive (p1), and two goal fields, as Arzamasove details below (2018):
+To reduce the impact, decentralizing the grid has been proposed. Arzamasov, Böhm and Jochem, of the Karlsruhe Institute of Technology in Germany suggest (2018), “Decentralize Smart Grid Control (DSGC) is a new system implementing demand response without significant changes of the infrastructure.” Analysis of the factors and impacts associated with implementing a DSGC system are outside of the scope of this paper. This paper will focus on implementation of machine learning models to predict stability of the grid, utilizing the data set Arzamasov created (2018). This data set is a simulation of a four-node star electrical grid with centralized production. The data set includes 14 total attributes - 11 predictive attributes, one non-predictive (p1), and two goal fields, as Arzamasov details below (2018):
 
 * tau[x]: reaction time of participant (real from the range [0.5,10]s). Tau1 - the value for electricity producer.
 * p[x]: nominal power consumed(negative)/produced(positive)(real). For consumers from the range [-0.5,-2]s^-2; p1 = abs(p2 + p3 + p4)
@@ -24,7 +24,7 @@ To reduce the impact, decentralizing the grid has been proposed Arzamasov, Bohm 
 * stab: the maximal real part of the characteristic equation root (if positive - the system is linearly unstable)(real)
 * stabf: the stability label of the system (categorical: stable/unstable)
 
-The Electrical Grid Stability Simulated Data data set was split 80/20. According to the random creation process Vadim Arzamasov described (2018), this allowed for the test set to be large enough to be a satisfactory representation of the data set as a whole and return statistically meaningful results. The R Caret package was leveraged heavily for modeling. Model algorithms were selected with the tasks of performing classification and regression in mind and those referenced in the *Towards Concise Models of Grid Stability* paper as well (Arzamasov, Böhm, and Jochem, 2018). The final algorithms selected were:
+The Electrical Grid Stability Simulated Data data set was split 80/20. According to the random creation process Vadim Arzamasov described (2018), this allowed for the test set to be large enough to be a satisfactory representation of the data set as a whole and return statistically meaningful results. The caret package was leveraged heavily for modeling. Model algorithms were selected for the tasks of performing classification and regression as well as those referenced in *Towards Concise Models of Grid Stability* (Arzamasov, Böhm, and Jochem, 2018). The selected algorithms were:
 
 * Classification and Regression Trees
 * k-Nearest Neighbors
@@ -32,7 +32,7 @@ The Electrical Grid Stability Simulated Data data set was split 80/20. According
 * Random Forest
 * Support Vector Machines with Radial Basis Function Kernel
 
-These algorithms were executed using the Caret packages Train function while applying 10 fold cross validation. The model with the highest accuracy in predicting stabf was selected for making final predictions. Support Vector Machines with Radial Basis Function Kernel will prove to be the best algorithm for predicting grid stability with an accuracy of 95%.
+These algorithms were executed using the caret package's train function while applying 10 fold cross validation. The model with the highest accuracy in predicting stabf was selected for making final predictions. Support Vector Machines with Radial Basis Function Kernel, with an accuracy of 95%, will prove to be the best algorithm for predicting grid stability.
 
 \begin{center}
 \textbf{Methodology}
@@ -105,7 +105,7 @@ egss <- as.data.frame(egss) %>% mutate(tau1 = as.numeric(tau1),
 egss_df <- as.data.frame(egss[,c(1,2,3,4,6,7,8,9,10,11,12,14)])
 # Test set will be 20% of Electrical Grid Stability Simulated data
 set.seed(1, sample.kind="Rounding")
-# Using Caret packages createDataPartition function to split training and test sets
+# Using caret packages createDataPartition function to split training and test sets
 test_index <- createDataPartition(y = egss_df$stabf, times = 1, p = 0.2, list = FALSE)
 train <- egss_df[-test_index,]
 temp <- egss_df[test_index,]
@@ -122,7 +122,7 @@ rm(dl, test_index, temp, removed)
 
 ### Data Ingestion
 
-The copy of the Electrical Grid Stability Simulated dataset used for this project is held in the UCI Machine Learning Repository. This copy is stored in a comma delimited format which requires data types to be mutated to usable formats. Attributes 1-13 are converted to numeric, and the 14th attribute is converted to a factor. During data ingestion, the training and testing data sets are created and represent an 80/20 split of the original data set. As previously mentioned, this constitutes a test set large enough to be a satisfactory representation of the data set as a whole and sufficient to return statistically meaningful results. To avoid unanticipated interference during training and testing, non-predictor attributes were removed from the data set.
+The Electrical Grid Stability Simulated data set used for this project is held in the UCI Machine Learning Repository (2019). This copy is stored in a comma delimited format which requires data types to be mutated to usable formats. Attributes 1-13 are converted to numeric, and the 14th attribute is converted to a factor. During data ingestion, the training and testing data sets are created and represent an 80/20 split of the original data set. As previously mentioned, this constitutes a test set large enough to be a satisfactory representation of the data set as a whole and sufficient to return statistically meaningful results. To avoid unanticipated interference during training and testing, non-predictor attributes were removed from the data set.
 
 ### Data Structure
  
@@ -131,6 +131,8 @@ str(egss)
 ```
 
 The data is tidy, and the ingestion script has successfully transformed the data to the correct format for this analysis.
+
+\pagebreak
 
 ### Null Values Check
 
@@ -165,6 +167,8 @@ ggplot(egss, aes(p1)) +
   xlab("Distribution of Power Consumption")
 ```
 
+\pagebreak
+
 This data exploration shows that the data is tidy. There are no null values to be handled. The proportion of unstable is greater than the stable, representing 64% of the entire data set. Finally, there is a normal distribution of the Distribution of Power Consumption of the p1 attribute. The p1 was defined as representation of the consumers and the actual is calculated as p1 = abs(p2 + p3 + p4).
 
 When visualizing the 11 predictors across the stabf goal attribute there is even distribution with very little variance. Could this be an indication that the data set is overtly normal or simply minimal variances in electrical grid supply and demand disruptions?
@@ -187,7 +191,7 @@ featurePlot(x = egss[, 1:12],
 
 ### Modeling
 
-The modeling approach used for this analysis was to leverage the R Caret Package. The previous data exploration and the data set document on the UCI Repository show the following:
+The modeling approach used for this analysis was to leverage the caret package. The previous data exploration and the data set document on the UCI Repository (2019) show the following:
 
 * Data is clean and normalized
 * Data includes 10,000 rows of 14 attributes
@@ -195,9 +199,10 @@ The modeling approach used for this analysis was to leverage the R Caret Package
 * Data includes one non-predictive value (p1)
 * Data includes two goal attributes (stab and stabf)
 * Well-suited for Classification and Regression
-*Note:* If further exploration is desired, additional information on this package may be found here https://cran.r-project.org/web/packages/caret/vignettes/caret.html.
 
-Given the data is well-suited for Classification and Regression, these model types will be utilized by leveraging the train function of the Caret package. Kuhn (2019) instructs that the train function can be used to:
+*Note: If further exploration is desired, additional information on this package may be found here https://cran.r-project.org/web/packages/caret/vignettes/caret.html*
+
+Given the data is well-suited for Classification and Regression, these model types will be utilized by leveraging the train function of the caret package. Kuhn (2019) instructs that the train function can be used to:
 
 * evaluate, using resampling, the effect of model tuning parameters on performance
 * choose the ``optimal’’ model across these parameters
@@ -317,9 +322,12 @@ print(cm)
 
 The following confusion matrix shared on www.stackoverflow.com (2017) summarizes the outcome of the Support Vector Machines with Radial Basis Function Kernel model on the Electrical Grid Stability Simulated data set. The ability to make accurate predictions will be a key factor in implementing decentralized electrical grids while maintaining the required reliability. This analysis shows that machine learning algorithms can be implemented within energy management systems to make operators aware of disrupting events, such as surges in either supply or demand.
 
+\pagebreak
+
 **Figure 5**
 
 *Illustration of the confusion matrix output*
+
 
 ```{r, echo=FALSE}
 ##########################################################
@@ -334,7 +342,7 @@ draw_confusion_matrix <- function(cm) {
   layout(matrix(c(1,1,2)))
   par(mar=c(2,2,2,2))
   plot(c(100, 345), c(300, 450), type = "n", xlab="", ylab="", xaxt='n', yaxt='n')
-  title('CONFUSION MATRIX', cex.main=2)
+  title('Confusion Matrix', cex.main=1.4)
   # create the matrix 
   rect(150, 430, 240, 370, col='#3F97D0')
   text(195, 435, 'Class1', cex=1.2)
@@ -353,7 +361,7 @@ draw_confusion_matrix <- function(cm) {
   text(295, 400, res[3], cex=1.6, font=2, col='white')
   text(295, 335, res[4], cex=1.6, font=2, col='white')
   # add in the specifics 
-  plot(c(100, 0), c(100, 0), type = "n", xlab="", ylab="", main = "DETAILS", xaxt='n', yaxt='n')
+  plot(c(100, 0), c(100, 0), type = "n", xlab="", ylab="", main = "Details", xaxt='n', yaxt='n')
   text(10, 85, names(cm$byClass[1]), cex=1.2, font=2)
   text(10, 70, round(as.numeric(cm$byClass[1]), 3), cex=1.2)
   text(30, 85, names(cm$byClass[2]), cex=1.2, font=2)
@@ -365,10 +373,10 @@ draw_confusion_matrix <- function(cm) {
   text(90, 85, names(cm$byClass[7]), cex=1.2, font=2)
   text(90, 70, round(as.numeric(cm$byClass[7]), 3), cex=1.2)
   # add in the accuracy information 
-  text(30, 35, names(cm$overall[1]), cex=1.5, font=2)
-  text(30, 20, round(as.numeric(cm$overall[1]), 3), cex=1.4)
-  text(70, 35, names(cm$overall[2]), cex=1.5, font=2)
-  text(70, 20, round(as.numeric(cm$overall[2]), 3), cex=1.4)
+  text(30, 35, names(cm$overall[1]), cex=1.4, font=2)
+  text(30, 20, round(as.numeric(cm$overall[1]), 3), cex=1.2)
+  text(70, 35, names(cm$overall[2]), cex=1.4, font=2)
+  text(70, 20, round(as.numeric(cm$overall[2]), 3), cex=1.2)
 }  
 draw_confusion_matrix(cm)
 ```
@@ -391,7 +399,7 @@ Kuhn, M. (2019). The caret Package. Retrieved from http://topepo.github.io/caret
 
 Overleaf. (2020). Help documentation. Retrieved from https://www.overleaf.com/learn
 
-Stack Overflow. (May 22, 2017). R How to Visualize Confusion Matrix Using the Caret Package. Edited by Cybernetic. Retrieved from https://stackoverflow.com/questions/23891140/r-how-to-visualize-confusion-matrix-using-the-caret-package
+Stack Overflow. (2017). R How to Visualize Confusion Matrix Using the Caret Package. Edited by Cybernetic. Retrieved from https://stackoverflow.com/questions/23891140/r-how-to-visualize-confusion-matrix-using-the-caret-package
 
 The Comprehensive R Archive Network. (n.d.). A Short Introduction to the caret Package. Retrieved from https://cran.r-project.org/web/packages/caret/vignettes/caret.html
 
