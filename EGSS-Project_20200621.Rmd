@@ -1,7 +1,5 @@
 ---
 output: pdf_document
-header-includes:
- - \usepackage{setspace}\doublespacing
 fontsize: 12pt
 title: "Electric Grid Stability Analysis"
 author: "William G. Stalnaker (wgstalnaker)"
@@ -31,6 +29,8 @@ The Electrical Grid Stability Simulated Data data set was split 80/20. According
 * Naive Bayes
 * Random Forest
 * Support Vector Machines with Radial Basis Function Kernel
+
+\pagebreak
 
 These algorithms were executed using the caret package's train function while applying 10 fold cross validation. The model with the highest accuracy in predicting stabf was selected for making final predictions. Support Vector Machines with Radial Basis Function Kernel, with an accuracy of 95%, will prove to be the best algorithm for predicting grid stability.
 
@@ -150,6 +150,8 @@ No null values to be handled.
 summary(egss)
 ```
 
+\pagebreak
+
 **Figure 1**
 
 *Illustration of grid stability and power consumption distributions*
@@ -167,7 +169,6 @@ ggplot(egss, aes(p1)) +
   xlab("Distribution of Power Consumption")
 ```
 
-\pagebreak
 
 This data exploration shows that the data is tidy. There are no null values to be handled. The proportion of unstable is greater than the stable, representing 64% of the entire data set. Finally, there is a normal distribution of the Distribution of Power Consumption of the p1 attribute. The p1 was defined as representation of the consumers and the actual is calculated as p1 = abs(p2 + p3 + p4).
 
@@ -186,8 +187,6 @@ featurePlot(x = egss[, 1:12],
             scales = list(x = list(relation="free"), 
                           y = list(relation="free")))
 ```
-
-\pagebreak
 
 ### Modeling
 
@@ -210,7 +209,6 @@ Given the data is well-suited for Classification and Regression, these model typ
 
 Training model evaluation will use 10-fold cross validation. Five different models will be evaluated, and the model that produces the greatest accuracy will be chosen to make the final prediction. Where appropriate, that model will be tuned for optimal accuracy.
 
-\pagebreak
 
 ```{r, include=TRUE}
 # Run algorithms using 10-fold cross validation
@@ -323,8 +321,6 @@ print(cm)
 \end{center}
 
 The following confusion matrix shared on www.stackoverflow.com (2017) summarizes the outcome of the Support Vector Machines with Radial Basis Function Kernel model on the Electrical Grid Stability Simulated data set. The ability to make accurate predictions will be a key factor in implementing decentralized electrical grids while maintaining the required reliability. This analysis shows that machine learning algorithms can be implemented within energy management systems to make operators aware of disrupting events, such as surges in either supply or demand.
-
-\pagebreak
 
 **Figure 5**
 
