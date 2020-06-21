@@ -200,7 +200,7 @@ The modeling approach used for this analysis was to leverage the caret package. 
 * Data includes two goal attributes (stab and stabf)
 * Well-suited for Classification and Regression
 
-*Note: If further exploration is desired, additional information on this package may be found here https://cran.r-project.org/web/packages/caret/vignettes/caret.html*
+*Note: If further exploration is desired, additional information on this package may be found here: https://cran.r-project.org/web/packages/caret/vignettes/caret.html*
 
 Given the data is well-suited for Classification and Regression, these model types will be utilized by leveraging the train function of the caret package. Kuhn (2019) instructs that the train function can be used to:
 
@@ -209,6 +209,8 @@ Given the data is well-suited for Classification and Regression, these model typ
 * estimate model performance from a training set
 
 Training model evaluation will use 10-fold cross validation. Five different models will be evaluated, and the model that produces the greatest accuracy will be chosen to make the final prediction. Where appropriate, that model will be tuned for optimal accuracy.
+
+\pagebreak
 
 ```{r, include=TRUE}
 # Run algorithms using 10-fold cross validation
