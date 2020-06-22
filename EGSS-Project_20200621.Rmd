@@ -203,6 +203,8 @@ The modeling approach used for this analysis was to leverage the caret package. 
 
 *Note: If further exploration is desired, additional information on this package may be found here: https://cran.r-project.org/web/packages/caret/vignettes/caret.html*
 
+\pagebreak
+
 Given the data is well-suited for Classification and Regression, these model types will be utilized by leveraging the train function of the caret package. Kuhn (2019) instructs that the train function can be used to:
 
 * evaluate, using resampling, the effect of model tuning parameters on performance
@@ -277,6 +279,8 @@ results <- resamples(list(cart=fit_cart,
 
 ```
 
+\pagebreak
+
 \begin{center}
 \textbf{Results}
 \end{center}
@@ -293,6 +297,8 @@ dotplot(results)
 ```
 
 Additionally, we can use the following plot to visualize the optimal sigma tuning parameter:
+
+\pagebreak
 
   **Figure 4**
 
